@@ -13,7 +13,7 @@ import 'primeicons/primeicons.css';
 import 'prismjs/themes/prism-coy.css';
 import './assets/styles/layout.scss';
 
-// axios.defaults.baseURL = 'http://localhost:3000/api/v1/';
+axios.defaults.baseURL = 'http://localhost:3000/api/v1/';
 
 const app = createApp(App);
 
