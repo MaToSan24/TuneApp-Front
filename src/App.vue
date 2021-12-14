@@ -14,7 +14,7 @@
   export default {
     data() {
         return {
-            layoutMode: 'static',
+            layoutMode: 'overlay',
             staticMenuInactive: false,
             overlayMenuActive: false,
             mobileMenuActive: false,
