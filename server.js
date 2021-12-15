@@ -18,8 +18,8 @@ app.get("/", (req, res) => {
   res.redirect(frontendURL);
 });
 
-app.use(require('./src/routes/login'));
-app.use(require('./src/routes/register'));
+app.use('/api/v1/login', require('./src/routes/login'));
+app.use('/api/v1/register', require('./src/routes/register'));
 app.use('/api/v1/users', require('./src/routes/users'));
 
 module.exports = app;

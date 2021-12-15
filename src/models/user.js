@@ -9,6 +9,11 @@ let validRoles = {
 const userSchema = mongoose.Schema({
 
     _id: mongoose.Schema.Types.ObjectId,
+    username: {
+        type: String,
+        unique: true,
+        required: [true, "Username is required"],
+    },
     email: {
         type: String,
         unique: true,

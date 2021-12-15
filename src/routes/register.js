@@ -4,11 +4,12 @@ const mongoose = require("mongoose");
 const User = require('./../models/user');
 const app = express();
 
-app.post('/register', function (req, res) {
+app.post('/', function (req, res) {
     let body = req.body;
-    let { email, password, role } = body;
+    let { username, email, password, role } = body;
     let user = new User({
         _id: new mongoose.Types.ObjectId(),
+        username,
         email,
         password: bcrypt.hashSync(password, 10),
         role
