@@ -62,4 +62,19 @@ router.put('/:id', async(req, res) => {
     }
 });
 
+router.delete('/:id', async(req, res) => {
+    const _id = req.params.id;
+    
+    try {
+        const userDB = await User.findByIdAndDelete(_id);
+        res.status(200).json(userDB);
+    } catch (error) {
+        return res.status(500).json({
+            mensaje: 'An error has occurred',
+            error
+        })
+    }
+});
+
+
 module.exports = router;
