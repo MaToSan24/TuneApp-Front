@@ -17,4 +17,8 @@ jobs:
           TOKEN_TTL: ${{ secrets.TOKEN_TTL }}
     - run: |
             npm ci
+            touch .env
+            echo MONGO_URL="$MONGO_URL" >> .env
+            echo AUTH_SEED="$AUTH_SEED" >> .env
+            echo TOKEN_TTL="$TOKEN_TTL" >> .env
             npm run ci
