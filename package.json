@@ -7,7 +7,9 @@
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "test": "mocha tests/unit/*.js --timeout 15000"
+    "test": "mocha tests/unit/*.js --timeout 15000",
+    "ci": "start-test \"npm run serve\" 8080 ci-2",
+    "ci-2": "start-test \"node index.js\" http://localhost:3000/api/v1/users test"
   },
   "dependencies": {
     "@vue/cli": "^4.5.13",
@@ -52,7 +54,8 @@
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^7.0.0",
     "node-sass": "^4.12.0",
-    "sass-loader": "^8.0.2"
+    "sass-loader": "^8.0.2",
+    "start-server-and-test": "^1.14.0"
   },
   "eslintConfig": {
     "root": true,
