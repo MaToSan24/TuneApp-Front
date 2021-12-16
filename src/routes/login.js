@@ -31,8 +31,8 @@ app.post('/', async function (req, res) {
         }
 
         let token = jwt.sign({ user: userDB },
-            process.env.AUTH_SEED | "test",
-            { expiresIn: process.env.TOKEN_TTL | "1h"
+            process.env.AUTH_SEED,
+            { expiresIn: process.env.TOKEN_TTL
         });
 
         res.json({
