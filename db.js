@@ -2,7 +2,7 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 var User = require("./src/models/user");
 
-const DB_URL = process.env.MONGO_URL
+const DB_URL = process.env.MONGO_URL | "mongodb://localhost:3000/TuneApp"
 
 const dbConnect = function () {
   const db = mongoose.connection;
