@@ -11,8 +11,5 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 14.16.0
-        cache: 'npm'
     - run: npm ci
-    - run: npm run serve
-    - run: node index.js
-    - run: npm test
+    - run: npm run serve & node index.js & npm test
