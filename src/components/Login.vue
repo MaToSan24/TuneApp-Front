@@ -18,10 +18,7 @@
 
                 <div class="form-group">
                     <button class="btn btn-primary btn-block" :disabled="loading">
-                        <span
-                        v-show="loading"
-                        class="spinner-border spinner-border-sm"
-                        ></span>
+                        <span v-show="loading" class="spinner-border spinner-border-sm" />
                         <span>Login</span>
                     </button>
                 </div>
@@ -41,54 +38,49 @@ import { Form, Field, ErrorMessage } from "vee-validate";
 import * as yup from "yup";
 
 export default {
-name: "Login",
-components: {
-    Form,
-    Field,
-    ErrorMessage,
-},
-data() {
-    const schema = yup.object().shape({
-        username: yup.string().required("Username is required!"),
-        password: yup.string().required("Password is required!"),
-    });
-
-    return {
-        loading: false,
-        message: "",
-        schema,
-    };
-},
-computed: {
-    loggedIn() {
-        return this.$store.state.auth.status.loggedIn;
+    name: "Login",
+    components: {
+        Form,
+        Field,
+        ErrorMessage,
     },
-},
-created() {
-    if (this.loggedIn) {
-        this.$router.push("/profile");
-    }
-},
-methods: {
-    handleLogin(user) {
-    this.loading = true;
+    data() {
+        const schema = yup.object().shape({
+            username: yup.string().required("Username is required!"),
+            password: yup.string().required("Password is required!"),
+        });
 
-    this.$store.dispatch("auth/login", user).then(
-        () => {
-        this.$router.push("/profile");
+        return {
+            loading: false,
+            message: "",
+            schema,
+        };
+    },
+    computed: {
+        loggedIn() {
+            return this.$store.state.auth.status.loggedIn;
         },
-        (error) => {
-        this.loading = false;
-        this.message =
-            (error.response &&
-            error.response.data &&
-            error.response.data.message) ||
-            error.message ||
-            error.toString();
-        }
-    );
     },
-},
+    created() {
+        if (this.loggedIn) {
+            this.$router.push("/");
+        }
+    },
+    methods: {
+        handleLogin(user) {
+        this.loading = true;
+
+        this.$store.dispatch("auth/login", user)
+        .then(
+            () => {
+                this.$router.push("/");
+            },
+            (error) => {
+                this.loading = false;
+                this.message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+            });
+        },
+    },
 };
 </script>
 

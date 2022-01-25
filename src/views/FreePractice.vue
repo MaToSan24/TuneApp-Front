@@ -1,17 +1,6 @@
 <template>
 
   <div>
-    <!-- <div style="display: flex;flex-direction: column; align-content: center; justify-content: center; align-items: center;
-                position: absolute; top: 1rem; right: 2rem;">
-
-      <router-link to="/login">
-        <Button class="p-button-info mt-5" style="width: 150%;">Login</Button>
-      </router-link>
-      <p>
-        Don't have an account yet? <router-link to="/register">Register now</router-link>
-      </p>
-
-    </div> -->
     <div v-if="!currentUser" class="navbar-nav ml-auto">
       <li class="nav-item">
         <router-link to="/register" class="nav-link">
@@ -45,19 +34,13 @@
     <div class="card col-7" style="display: flex; justify-content: space-around; align-items: center; flex-direction: column; height: 50rem">
       
       <div style="text-align-last: center;">
-        <h1>Welcome to TuneApp</h1>
+        <h1>Welcome to Free Practice Mode</h1>
         <img alt="TuneApp Logo" :src="TuneAppLogo" height="100" class="mt-5" />
       </div>
 
       <div style="display: flex; flex-direction: column; align-items: center;">
-        <router-link to="/rebuildSong">
-          <Button class="p-button-info">Rebuild the song</Button>
-        </router-link>
-        <router-link to="/freePractice">
-          <Button class="p-button-info mt-5">Free practice</Button>
-        </router-link>
-        <router-link to="/perfectPitch">
-          <Button class="p-button-info mt-5">Perfect pitch</Button>
+        <router-link to="/">
+          <Button class="p-button-info">Home</Button>
         </router-link>
       </div>
     </div>

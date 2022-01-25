@@ -2,9 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Login from "../components/Login.vue";
 import Register from "../components/Register.vue";
-const Profile = () => import("../components/Profile.vue")
 const BoardAdmin = () => import("../components/BoardAdmin.vue")
-const BoardUser = () => import("../components/BoardUser.vue")
+const RebuildSong = () => import("../views/RebuildSong.vue")
+const FreePractice = () => import("../views/FreePractice.vue")
+const PerfectPitch = () => import("../views/PerfectPitch.vue")
 
 const routes = [
   {
@@ -21,19 +22,24 @@ const routes = [
     component: Register,
   },
   {
-    path: "/profile",
-    name: "profile",
-    component: Profile,
-  },
-  {
     path: "/admin",
     name: "admin",
     component: BoardAdmin,
   },
   {
-    path: "/user",
-    name: "user",
-    component: BoardUser,
+    path: "/rebuildSong",
+    name: "rebuildSong",
+    component: RebuildSong,
+  },
+  {
+    path: "/freePractice",
+    name: "freePractice",
+    component: FreePractice,
+  },
+  {
+    path: "/perfectPitch",
+    name: "perfectPitch",
+    component: PerfectPitch,
   },
 ]
 
@@ -43,7 +49,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const publicPages = ['/login', '/register', '/'];
+  const publicPages = ['/', '/login', '/register', '/freePractice', '/perfectPitch'];
   const authRequired = !publicPages.includes(to.path);
   const loggedIn = localStorage.getItem('user');
 
