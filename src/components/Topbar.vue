@@ -2,18 +2,14 @@
 	<div class="layout-topbar">
 
         <router-link to="/" class="layout-topbar-logo mr-3">
-            <img alt="Rose Logo" :src="RoseLogo" />
-            <span class="mr-3">ROSE</span>
-            <img alt="Wecaremed Logo" :src="WecaremedLogo" class="ml-2" />
-
+            <img alt="TuneApp Logo" :src="TuneAppLogo" height="100"/>
+            <span class="ml-3">TuneApp</span>
         </router-link>
-        
-        <InputSwitch id="appMode" v-model="toggleValue" @click="toggleView" />
-        <label id="app-mode-label" for="appMode">{{appModeText}} use mode</label>
         
         <ul class="layout-topbar-menu hidden lg:flex origin-top">
             <li>
-                <span>Logged in as Example User</span>
+                <span v-if="!$store.state.loggedIn">You are not logged in</span>
+                <span v-if="$store.state.loggedIn">Logged in as <u>{{$store.state.username}}</u></span>
                 <button class="p-link layout-topbar-button user-button" @click="toggleMenu">
                     <i class="pi pi-user"></i>
                 </button>
@@ -27,8 +23,8 @@
                     <span>Are you sure you want to log out?</span>
                 </div>
                 <template #footer>
-                    <Button label="No" icon="pi pi-times" @click="closeConfirmation" class="p-button-text p-button-info"/>
-                    <Button label="Yes" icon="pi pi-check" @click="closeConfirmation" class="p-button-text p-button-info" autofocus />
+                    <Button label="No" icon="pi pi-times" @click="closeConfirmation" class="p-button-text p-button-info" autofocus/>
+                    <Button label="Yes" icon="pi pi-check" @click="logout" class="p-button-text p-button-info" />
                 </template>
             </Dialog>
         </ul>
@@ -38,28 +34,22 @@
 </template>
 
 <script>
-import RoseLogo from '@/assets/ROSE Logo.png'
-import WecaremedLogo from '@/assets/Wecaremed Logo.png'
 import Menu from 'primevue/menu';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
-import InputSwitch from 'primevue/inputswitch';
-import { mapState, mapActions } from 'vuex'
-import Badge from 'primevue/badge'
+import TuneAppLogo from "@/assets/TuneAppLogoCropped.png"
+import axios from 'axios'
 
 export default {
     components: {
         Menu,
         Dialog,
         Button,
-        InputSwitch,
-        Badge
     },
     props: ['projectInfo'],
     data() {
         return {
-            RoseLogo: RoseLogo,
-            WecaremedLogo: WecaremedLogo,
+            TuneAppLogo: TuneAppLogo,
             displayConfirmation: false,
             overlayMenuItems: [
                 {
@@ -80,33 +70,20 @@ export default {
         closeConfirmation() {
             this.displayConfirmation = false;
         },
-        ...mapActions([
-        "toggleView"
-        ]),
-        // calculateCF() {
-        //     this.axios.put(`/projects/calculateCF/${this.$route.params.id}`)
-        //     .then((response) => {
-        //         // this.project = response.data;
-        //         console.log(response.data)
-        //     })
-        //     .catch((e)=>{
-        //         console.log('error' + e);
-        //     })
-        // },
-        getTextColorFromCFIndex(cfIndex) {
-            if (cfIndex < 3)
-                return "success"
-            else if (cfIndex > 3 & cfIndex < 5)
-                return "warning"
-            else
-                return "danger"
+        logout() {
+            this.closeConfirmation()
+            this.$store.dispatch("saveUsername", '');
+            this.$store.dispatch("savePassword", '');
+            this.$store.dispatch("saveUserId", '');
+            this.$store.dispatch("logOut");
+
+            axios.post('/auth/logout').then(() => {
+                this.$toast.add({severity:'success', summary: 'Successful', detail: 'Logged out successfully', life: 3000});
+            }).catch((err) => {
+                console.log("Error: ", err)
+            });
         }
     },
-    computed: {
-        ...mapState([
-            'toggleValue', 'appModeText'
-        ])
-    }
 }
 </script>
 

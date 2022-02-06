@@ -1,8 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import store from '../store'
 import Home from '../views/Home.vue'
-import Login from "../components/Login.vue";
-import Register from "../components/Register.vue";
-const BoardAdmin = () => import("../components/BoardAdmin.vue")
+const Login = () => import("../views/Login.vue");
 const RebuildSong = () => import("../views/RebuildSong.vue")
 const FreePractice = () => import("../views/FreePractice.vue")
 const PerfectPitch = () => import("../views/PerfectPitch.vue")
@@ -16,15 +15,6 @@ const routes = [
   {
     path: "/login",
     component: Login,
-  },
-  {
-    path: "/register",
-    component: Register,
-  },
-  {
-    path: "/admin",
-    name: "admin",
-    component: BoardAdmin,
   },
   {
     path: "/rebuildSong",
@@ -49,9 +39,9 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const publicPages = ['/', '/login', '/register', '/freePractice', '/perfectPitch'];
+  const publicPages = ['/', '/login', '/freePractice', '/perfectPitch'];
   const authRequired = !publicPages.includes(to.path);
-  const loggedIn = localStorage.getItem('user');
+  const loggedIn = store.state.loggedIn;
 
   // trying to access a restricted page + not logged in
   // redirect to login page

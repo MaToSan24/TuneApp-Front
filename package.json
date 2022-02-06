@@ -26,12 +26,11 @@
     "primeicons": "5.0.0",
     "primevue": "3.9.1",
     "prismjs": "1.9.0",
-    "vee-validate": "^4.5.7",
     "vue": "^3.0.0",
     "vue-axios": "^3.4.0",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0-0",
-    "yup": "^0.32.11"
+    "vuex-persistedstate": "^4.1.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
@@ -64,15 +63,6 @@
     },
     "rules": {},
     "overrides": [
-      {
-        "files": [
-          "**/__tests__/*.{j,t}s?(x)",
-          "**/tests/unit/**/*.spec.{j,t}s?(x)"
-        ],
-        "env": {
-          "mocha": true
-        }
-      },
       {
         "files": [
           "**/__tests__/*.{j,t}s?(x)",
