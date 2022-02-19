@@ -12,11 +12,11 @@
       </div>
 
       <div class="col-9" id="editorDiv">
-        <v-ace-editor id="ace-editor" v-model:value="editorContent" lang="abc" theme="clouds" style="height: 300px;" :placeholder="editorPlaceholder"/>
+        <v-ace-editor @change="rerender()" id="ace-editor" v-model:value="editorContent" lang="abc" theme="clouds" style="height: 300px;" :placeholder="editorPlaceholder"/>
       </div>
 
-      <div class="abcjsDiv">
-        <textarea id="abc-source" v-model="editorContent"></textarea>
+      <div class="abcjsDiv" >
+        <textarea id="abc-source" v-model="editorContent" style="display: none"/>
         <div class="listener-output">
           <div class="label">Currently Playing: <span class="abc-string">{{currentAbcFragment}}</span></div>
 
@@ -123,6 +123,20 @@ W:Dusty was the kiss, that I got frae the miller.`,
       else
         this.currentAbcFragment = "(none)";
     },
+    rerender() {
+      abcjs.renderAbc("paper", this.editorContent, {});
+      new abcjs.Editor("abc-source", {
+        canvas_id: "paper",
+        generate_midi: true,
+        midi_id: "midi",
+        abcjsParams: {
+          midiListener: this.listener,
+          animate: {
+           listener: this.animate,
+          }
+        }
+      });
+    }
   },
   computed: {
   }  
