@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@vue/cli": "^4.5.13",
+    "abcjs": "^5.12.0",
     "axios": "^0.24.0",
     "body-parser": "^1.19.1",
     "chai-http": "^4.3.0",
@@ -29,8 +30,10 @@
     "vue": "^3.0.0",
     "vue-axios": "^3.4.0",
     "vue-router": "^4.0.0-0",
+    "vue3-ace-editor": "^2.2.2",
     "vuex": "^4.0.0-0",
-    "vuex-persistedstate": "^4.1.0"
+    "vuex-persistedstate": "^4.1.0",
+    "font-awesome": "^4.7.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
@@ -61,7 +64,9 @@
     "parserOptions": {
       "parser": "babel-eslint"
     },
-    "rules": {},
+    "rules": {
+      "no-unused-vars": "off"
+    },
     "overrides": [
       {
         "files": [

@@ -1,5 +1,4 @@
 <template>
-<div>
   <Topbar />
 
   <div class="homeWrapper">
@@ -24,7 +23,6 @@
       </div>
     </div>
   </div>
-</div>
 </template>
 
 <script>
