@@ -6,34 +6,47 @@
 
     <div class="card col-7" style="display: flex; justify-content: space-around; align-items: center; flex-direction: column">
       
-      <div style="text-align-last: center;">
-        <h1>Welcome to the <u>Free Practice</u> Mode</h1>
+      <div style="text-align: center;">
+        <h1>Welcome to the <u>Perfect Pitch</u> Mode!</h1>
         <img alt="TuneApp Logo" :src="TuneAppLogo" height="100" class="mt-5" />
       </div>
 
-      <div class="mb-5">
-        <Button class="p-button-info mb-3" @click="playRandomNote()">Play a random note</Button>
-        <h5>Range: {{pitchRange[0]}}, {{pitchRange[1]}}</h5>
-        <h5>Range: {{currentMinNote}}, {{currentMaxNote}}</h5>
-        <Slider v-model="pitchRange" :range="true" :min="21" :max="102" class="mb-3" style="width: 14rem"/>
-        <h5>Number of options for guessing: {{numGuessingOptions}}</h5>
-        <Slider v-model="numGuessingOptions" :min="2" :max="12" style="width: 14rem"/>
-        <h5>Chosen random pitch: {{chosenRandomPitch}}</h5>
-        <h5>Chosen random note: {{chosenRandomNoteName}}</h5>
-        <h5>Guessing options: {{guessingOptions}}</h5>
-        <div id="guessingOptionsDiv">
-          <Button v-for="option in guessingOptions" :key="option" class="p-button-info mx-2" @click="guessOption(option)">{{option.note}}</Button>
+      <div style="text-align: center; display: flex; flex-direction: column; align-items: center;" class="my-5">
+        <Button class="p-button-info mb-3" style="width: fit-content;" @click="playRandomNote()">Play a random note</Button>
+        <fieldset id="settingsFieldset" class="p-3 mb-3" style="width: fit-content; border: groove 3px; text-align: center">
+          <legend>Settings</legend>
+          <div class="my-3" style="display: flex; align-items: center; flex-direction: column;">
+            <h5>Guess notes from {{currentMinNote}} to {{currentMaxNote}}</h5>
+            <Slider v-model="pitchRange" :range="true" :min="21" :max="102" class="mb-3" style="width: 14rem"/>
+          </div>
+          <div class="my-3" style="display: flex; align-items: center; flex-direction: column;">
+            <h5>Number of options: {{numGuessingOptions}}</h5>
+            <Slider v-model="numGuessingOptions" :min="2" :max="12" style="width: 14rem"/>
+          </div>
+          <Button class="p-button-info mb-3" style="width: fit-content;" @click="resetSettings()">Reset to default settings</Button>
+        </fieldset>
+
+        <h3 v-if="this.guessedSolution" class="my-3">Correct! The note was: {{chosenRandomNoteName}}</h3>
+
+        <fieldset v-if="guessingOptions.length > 0" id="guessingOptionsFieldset" class="col-12 mt-3 p-3" style="border: groove 3px; text-align: center">
+          <legend>Options</legend>
+          <Button v-for="option in guessingOptions" :key="option" class="mx-2 my-2"
+          @click="guessOption(option)" :class="getGuessColor(option)">{{option.note}}</Button>
+        </fieldset>
+
+        <div class="mt-4" style="width: 25rem">
+          <ProgressBar :value=" numberOfAttempts == 0 ? 0 : parseInt((correctGuesses/numberOfAttempts*100).toFixed(2))" />
         </div>
+
         <h5>Number of guessing attempts: {{numberOfAttempts}}</h5>
         <h5>Number of correct guesses: {{correctGuesses}}</h5>
         <h5>Number of incorrect guesses: {{incorrectGuesses}}</h5>
-        <ProgressBar :value="(correctGuesses/numberOfAttempts*100).toFixed(2) || 0" />
-        <h5 v-if="this.guessedSolution">Correct! The note was: {{chosenRandomNoteName}}</h5>
-        
       </div>
-      <div style="display: flex; flex-direction: column; align-items: center;">
+
+      <div style="display: flex; align-items: center;">
+        <Button class="p-button-info mr-2" style="width: fit-content;" @click="resetStatistics()">Reset statistics</Button>
         <router-link to="/">
-          <Button class="p-button-info">Home</Button>
+          <Button class="p-button-info ml-2">Home</Button>
         </router-link>
       </div>
     </div>
@@ -48,6 +61,8 @@ import ProgressBar from 'primevue/progressbar';
 import TuneAppLogo from "@/assets/TuneAppLogoCropped.png"
 import Topbar from '@/components/Topbar'
 import abcjs from "abcjs/midi";
+import correctGuess from '../assets/sounds/correctGuess.mp3'
+import incorrectGuess from '../assets/sounds/incorrectGuess.mp3'
 
 export default {
   name: 'Home',
@@ -62,7 +77,7 @@ export default {
       TuneAppLogo: TuneAppLogo,
       pitchRange: [60, 71],
       chosenRandomPitch: 0,
-      numGuessingOptions: 12,
+      numGuessingOptions: 6,
       guessingOptions: [],
       correctGuesses: 0,
       incorrectGuesses: 0,
@@ -89,13 +104,6 @@ export default {
           this.guessingOptions.push({pitch: this.chosenRandomPitch, note: abcjs.synth.pitchToNoteName[this.chosenRandomPitch]})
       }
     },
-    // randomChord() {
-    //   [   // a C chord
-    //     {pitch:60,durationInMeasures:2,volume:70,instrument:0},
-    //     {pitch:64,durationInMeasures:2,volume:70,instrument:0},
-    //     {pitch:67,durationInMeasures:2,volume:70,instrument:0},
-    //   ]
-    // },
     playNotes(notesToBePlayed) {
       // playEvent(notesToBePlayed, graceNotesToBePlayed, measureDurationInMilliseconds)
       abcjs.synth.playEvent(notesToBePlayed, [], 1000).then(function (response) {
@@ -107,13 +115,50 @@ export default {
     guessOption(option) {
       if (!this.guessedSolution) {
         this.numberOfAttempts++
+        var audio;
         if (option.pitch === this.chosenRandomPitch) {
+          option.isCorrect = true
+          audio = new Audio(correctGuess);
+          audio.volume = 0.15
+          audio.play();
           this.correctGuesses++
           this.guessedSolution = true
-        } else
+        } else {
+          option.isCorrect = false
+          audio = new Audio(incorrectGuess);
+          audio.volume = 0.4
+          audio.play();
           this.incorrectGuesses++
+        }
       }
+    },
+    getGuessColor(option) {
+      if (option.isCorrect == true)
+        return 'p-button-success'
+      else if (option.isCorrect == false)
+        return 'p-button-danger'
+      else
+        return 'p-button-primary'
+    },
+    resetStatistics() {
+      this.correctGuesses = 0
+      this.incorrectGuesses = 0
+      this.numberOfAttempts = 0
+    },
+    resetSettings() {
+      this.pitchRange = [60, 71]
+      this.numGuessingOptions = 6
     }
+  },
+  watch: {
+    pitchRange() {
+      if (Math.abs(this.pitchRange[0] - this.pitchRange[1]) === 0 && this.pitchRange[0] === 21)
+        this.pitchRange = [this.pitchRange[0], this.pitchRange[1] + 1]
+      else if (Math.abs(this.pitchRange[0] - this.pitchRange[1]) === 0 && this.pitchRange[1] === 102)
+        this.pitchRange = [this.pitchRange[0] - 1, this.pitchRange[1]]
+      else if (Math.abs(this.pitchRange[0] - this.pitchRange[1]) === 0)
+        this.pitchRange = [this.pitchRange[0] - 1, this.pitchRange[1]]
+    },
   },
   computed: {
     currentMinNote() {
@@ -126,8 +171,7 @@ export default {
       return abcjs.synth.pitchToNoteName[this.chosenRandomPitch]
     },
     currentProgressBarColor() {
-      let percentage = (this.correctGuesses/this.numberOfAttempts*100).toFixed(2)
-      console.log("Percentage: ", percentage)
+      let percentage = parseInt((this.correctGuesses/this.numberOfAttempts*100).toFixed(2))
       if (isNaN(percentage))
         return "grey"
       else if (percentage <= 33.33)
