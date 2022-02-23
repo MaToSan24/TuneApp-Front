@@ -12,6 +12,7 @@
       </div>
 
       <div class="col-9 mb-5" id="editorDiv">
+        <!-- The editor and the sheet music have lost the ability to color the selection when notes are clicked -->
         <v-ace-editor @change="rerender()" id="ace-editor" v-model:value="editorContent" lang="abc" theme="clouds" style="height: 300px;" />
       </div>
 
