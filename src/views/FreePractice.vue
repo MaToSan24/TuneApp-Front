@@ -26,9 +26,9 @@
       </div>
 
       <div class="abcjsDiv mt-5" >
-        <textarea id="abc-source" v-model="editorContent" style="display: none"/>
+        <textarea id="abc-source" v-model="editorContent" />
         <div id="midi"></div>
-        <div id="paper"></div>
+        <div id="paper" @click="selectInAceEditor()"></div>
       </div>
 
       <div style="display: flex; flex-direction: column; align-items: center;">
@@ -37,6 +37,8 @@
         </router-link>
       </div>
     </div>
+
+    <Button class="p-button-info" @click="log">Home</Button>
 
   </div>
 </template>
@@ -47,6 +49,7 @@ import RadioButton from 'primevue/radiobutton';
 import TuneAppLogo from "@/assets/TuneAppLogoCropped.png"
 import Topbar from '@/components/Topbar'
 import { VAceEditor } from 'vue3-ace-editor';
+import ace from 'ace-builds';
 import 'ace-builds/webpack-resolver';
 import "font-awesome/css/font-awesome.min.css";
 import 'abcjs/abcjs-midi.css';
@@ -71,6 +74,7 @@ export default {
         {name: "FatBoy", url: "https://paulrosen.github.io/midi-js-soundfonts/FatBoy/"},
         {name: "MusyngKite", url: "https://paulrosen.github.io/midi-js-soundfonts/MusyngKite/"},
       ],
+      editor: null,
       editorContent: `%abc-2.1
 H:This file contains some example English tunes
 % note that the comments (like this one) are to highlight usages
@@ -90,7 +94,33 @@ BG G/2G/2G BG|FA Ac BA|BG G/2G/2G BG|DG GB AG:|
 W:Hey, the dusty miller, and his dusty coat;
 W:He will win a shilling, or he spend a groat.
 W:Dusty was the coat, dusty was the colour;
-W:Dusty was the kiss, that I got frae the miller.`,
+W:Dusty was the kiss, that I got frae the miller.
+
+X: 2
+T: Canzonetta a tre voci
+C: Claudio Monteverdi (1567-1643)
+M: C
+L: 1/4
+Q: "Andante mosso" 1/4 = 110
+%%score [1 2 3]
+V: 1 clef=treble name="Soprano" sname="A"
+V: 2 clef=treble name="Alto"    sname="T"
+V: 3 clef=bass middle=d name="Tenor"  sname="B"
+%%MIDI program 1 30 % recorder
+%%MIDI program 2 30
+%%MIDI program 3 30
+K: Eb
+% 1 - 4
+[V: 1] |:z4  |z4  |f2ec         |_ddcc        |
+w: Son que-sti~i cre-spi cri-ni~e
+w: Que-sti son gli~oc-chi che mi-
+[V: 2] |:c2BG|AAGc|(F/G/A/B/)c=A|B2AA         |
+w: Son que-sti~i cre-spi cri-ni~e que - - - - sto~il vi-so e
+w: Que-sti son~gli oc-chi che mi-ran - - - - do fi-so mi-
+[V: 3] |:z4  |f2ec|_ddcf        |(B/c/_d/e/)ff|
+w: Son que-sti~i cre-spi cri-ni~e que - - - - sto~il
+w: Que-sti son~gli oc-chi che mi-ran - - - - do
+`,
     }
   },
   created: function () {
@@ -125,11 +155,16 @@ W:Dusty was the kiss, that I got frae the miller.`,
     rerender() {
       let options = {}
 
-      console.log("Setting soundfont: ", this.soundFontUrl)
-      abcjs.midi.setSoundFont(this.soundFontUrl)
+      // console.log("Setting soundfont: ", this.soundFontUrl)
+      abcjs.midi.setSoundFont(this.soundFontUrl) // 
+      // abcjs.midi.setInstrument(0, 32)
+      // synthControl.setTune(visualObj[0], false, {program: 32})
+      // abcjs.synth.options = {program: 32}
+
+      // console.log("Synth options: ", abcjs.synth.options)
 
       abcjs.renderAbc("paper", this.editorContent, options);
-      new abcjs.Editor("abc-source", {
+      this.editor = new abcjs.Editor("abc-source", {
         canvas_id: "paper",
         generate_midi: true,
         midi_id: "midi",
@@ -140,10 +175,43 @@ W:Dusty was the kiss, that I got frae the miller.`,
           }
         }
       });
+
+      // console.log("This.editor: ", this.editor)
+    },
+    selectInAceEditor() {
+      var aceEditor = ace.edit("ace-editor")
+      let currentRow = 0
+      let startRow = 0
+      let endRow = 0
+      let startFound = false
+      let endFound = false
+      let editorRows = this.editorContent.split("\n")
+      let charsUntilSelectionStart = this.editor.editarea.getSelection().start
+      let charsUntilSelectionEnd = this.editor.editarea.getSelection().end
+
+      for (let row of editorRows) {
+        if (!startFound && charsUntilSelectionStart - row.length <= 0) {
+          startFound = true
+          startRow = currentRow
+          console.log("Start found at row '" + startRow + "', column '" + charsUntilSelectionStart + "': ")
+        }
+        if (!endFound && charsUntilSelectionEnd - row.length <= 0) {
+          endFound = true
+          endRow = currentRow
+          console.log("End found at row '" + endRow + "', column '" + charsUntilSelectionEnd + "': ")
+        }
+
+        if (startFound && endFound) {
+          aceEditor.selection.setSelectionRange(new ace.Range(startRow, charsUntilSelectionStart, endRow, charsUntilSelectionEnd))
+          break
+        } else {
+          currentRow++
+          charsUntilSelectionStart -= row.length + 1
+          charsUntilSelectionEnd -= row.length + 1
+        }
+      } 
     },
   },
-  computed: {
-  }  
 };
 
   <link rel="stylesheet" type="text/css" href="abcjs-audio.css"/>
