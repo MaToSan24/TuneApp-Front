@@ -7,7 +7,7 @@
     <div class="card col-7" style="display: flex; justify-content: space-around; align-items: center; flex-direction: column">
       
       <div style="text-align-last: center;">
-        <h1>Welcome to the <u>Rebuild the Song</u> Mode</h1>
+        <h1>Welcome to the <u>Rebuild the Song</u> Mode!</h1>
         <img alt="TuneApp Logo" :src="TuneAppLogo" height="100" class="mt-5" />
       </div>
 
