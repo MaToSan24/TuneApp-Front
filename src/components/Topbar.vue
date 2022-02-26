@@ -6,7 +6,7 @@
             <span class="ml-3">TuneApp</span>
         </router-link>
         
-        <ul class="layout-topbar-menu hidden lg:flex origin-top">
+        <ul class="layout-topbar-menu lg:flex origin-top">
             <li>
                 <span v-if="!$store.state.loggedIn">You are not logged in</span>
                 <span v-if="$store.state.loggedIn">Logged in as <u>{{$store.state.username}}</u></span>

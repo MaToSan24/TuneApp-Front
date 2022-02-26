@@ -4,29 +4,29 @@
 
   <div class="homeWrapper">
 
-    <div class="card col-7" style="display: flex; justify-content: space-around; align-items: center; flex-direction: column">
+    <div class="card col-7" style="width: auto; display: flex; justify-content: space-around; align-items: center; flex-direction: column">
       
       <div style="text-align-last: center;">
-        <h1>Welcome to the <u>Free Practice</u> Mode</h1>
-        <img alt="TuneApp Logo" :src="TuneAppLogo" height="100" class="mt-5" />
+        <h1>Welcome to the <u>Free Practice</u> Mode!</h1>
       </div>
 
-      <div class="col-9 mb-5" id="editorDiv">
-        <!-- The editor and the sheet music have lost the ability to color the selection when notes are clicked -->
-        <v-ace-editor @change="rerender()" id="ace-editor" v-model:value="editorContent" lang="abc" theme="clouds" style="height: 300px;" />
-      </div>
-
-      <div class="my-3">
+      <div class="col-9 mt-3 mb-1">
         <h2>Sound Font Options</h2>
         <p>Instructions: Reload the page, select the desired sound font and click the play button.</p>
         <div v-for="option in soundFontOptions" :key="option.url">
-          <RadioButton :id="option.name" name="soundFontOption" :value="option.url" v-model="soundFontUrl" @change="rerender" />
-          <label :for="option.name">{{option.name}}</label>
+          <div class="mb-2">
+            <RadioButton :id="option.name" name="soundFontOption" :value="option.url" v-model="soundFontUrl" @change="rerender" />
+            <label class="ml-1" style="line-height: 1.66" :for="option.name">{{option.name}}</label>
+          </div>
         </div>
       </div>
 
-      <div class="abcjsDiv mt-5" >
-        <textarea id="abc-source" v-model="editorContent" />
+      <div class="col-9" id="editorDiv">
+        <v-ace-editor @input="rerender()" id="ace-editor" v-model:value="editorContent" lang="abc" theme="clouds" style="height: 300px;" />
+      </div>
+
+      <div class="abcjsDiv mt-3">
+        <textarea id="abc-source" v-model="editorContent" style="display: none" />
         <div id="midi"></div>
         <div id="paper" @click="selectInAceEditor()"></div>
       </div>
@@ -37,8 +37,6 @@
         </router-link>
       </div>
     </div>
-
-    <Button class="p-button-info" @click="log">Home</Button>
 
   </div>
 </template>
@@ -74,13 +72,13 @@ export default {
         {name: "FatBoy", url: "https://paulrosen.github.io/midi-js-soundfonts/FatBoy/"},
         {name: "MusyngKite", url: "https://paulrosen.github.io/midi-js-soundfonts/MusyngKite/"},
       ],
+      render: null,
       editor: null,
       editorContent: `%abc-2.1
 H:This file contains some example English tunes
 % note that the comments (like this one) are to highlight usages
 %  and would not normally be included in such detail
 O:England             % the origin of all tunes is England
-
 X:1                   % tune no 1
 T:Dusty Miller, The   % title
 T:Binny's Jig         % an alternative title
@@ -88,39 +86,14 @@ C:Trad.               % traditional
 R:DH                  % double hornpipe
 M:3/4                 % meter
 K:G                   % key
+%%MIDI program 32     % 32 = instrument code, defaults to 0
 B>cd BAG|FA Ac BA|B>cd BAG|DG GB AG:|
 Bdd gfg|aA Ac BA|Bdd gfa|gG GB AG:|
 BG G/2G/2G BG|FA Ac BA|BG G/2G/2G BG|DG GB AG:|
 W:Hey, the dusty miller, and his dusty coat;
 W:He will win a shilling, or he spend a groat.
 W:Dusty was the coat, dusty was the colour;
-W:Dusty was the kiss, that I got frae the miller.
-
-X: 2
-T: Canzonetta a tre voci
-C: Claudio Monteverdi (1567-1643)
-M: C
-L: 1/4
-Q: "Andante mosso" 1/4 = 110
-%%score [1 2 3]
-V: 1 clef=treble name="Soprano" sname="A"
-V: 2 clef=treble name="Alto"    sname="T"
-V: 3 clef=bass middle=d name="Tenor"  sname="B"
-%%MIDI program 1 30 % recorder
-%%MIDI program 2 30
-%%MIDI program 3 30
-K: Eb
-% 1 - 4
-[V: 1] |:z4  |z4  |f2ec         |_ddcc        |
-w: Son que-sti~i cre-spi cri-ni~e
-w: Que-sti son gli~oc-chi che mi-
-[V: 2] |:c2BG|AAGc|(F/G/A/B/)c=A|B2AA         |
-w: Son que-sti~i cre-spi cri-ni~e que - - - - sto~il vi-so e
-w: Que-sti son~gli oc-chi che mi-ran - - - - do fi-so mi-
-[V: 3] |:z4  |f2ec|_ddcf        |(B/c/_d/e/)ff|
-w: Son que-sti~i cre-spi cri-ni~e que - - - - sto~il
-w: Que-sti son~gli oc-chi che mi-ran - - - - do
-`,
+W:Dusty was the kiss, that I got frae the miller.`,
     }
   },
   created: function () {
@@ -153,30 +126,23 @@ w: Que-sti son~gli oc-chi che mi-ran - - - - do
         this.currentAbcFragment = "(none)";
     },
     rerender() {
-      let options = {}
-
       // console.log("Setting soundfont: ", this.soundFontUrl)
-      abcjs.midi.setSoundFont(this.soundFontUrl) // 
-      // abcjs.midi.setInstrument(0, 32)
-      // synthControl.setTune(visualObj[0], false, {program: 32})
-      // abcjs.synth.options = {program: 32}
+      abcjs.midi.setSoundFont(this.soundFontUrl)
 
-      // console.log("Synth options: ", abcjs.synth.options)
+      this.render = abcjs.renderAbc("paper", this.editorContent, {});
 
-      abcjs.renderAbc("paper", this.editorContent, options);
       this.editor = new abcjs.Editor("abc-source", {
         canvas_id: "paper",
         generate_midi: true,
         midi_id: "midi",
         abcjsParams: {
+          add_classes: true,
           midiListener: this.listener,
           animate: {
            listener: this.animate,
           }
         }
       });
-
-      // console.log("This.editor: ", this.editor)
     },
     selectInAceEditor() {
       var aceEditor = ace.edit("ace-editor")
@@ -193,12 +159,12 @@ w: Que-sti son~gli oc-chi che mi-ran - - - - do
         if (!startFound && charsUntilSelectionStart - row.length <= 0) {
           startFound = true
           startRow = currentRow
-          console.log("Start found at row '" + startRow + "', column '" + charsUntilSelectionStart + "': ")
+          // console.log("Start found at row '" + startRow + "', column '" + charsUntilSelectionStart + "': ")
         }
         if (!endFound && charsUntilSelectionEnd - row.length <= 0) {
           endFound = true
           endRow = currentRow
-          console.log("End found at row '" + endRow + "', column '" + charsUntilSelectionEnd + "': ")
+          // console.log("End found at row '" + endRow + "', column '" + charsUntilSelectionEnd + "': ")
         }
 
         if (startFound && endFound) {
@@ -253,6 +219,10 @@ input[type=text] {
 textarea {
 	width: 50%;
 	height: 500px;
+}
+
+.layout-wrapper {
+  min-width: fit-content;
 }
 
 </style>
