@@ -1,6 +1,6 @@
 <template>
   
-  <Toast />
+<Toast position="bottom-right"/>
 
   <div class="grid" style="justify-content: center;">
     <div class="col-4">

@@ -20,6 +20,9 @@
         <router-link to="/perfectPitch">
           <Button class="p-button-info mt-5">Perfect pitch</Button>
         </router-link>
+        <router-link to="/ranking">
+          <Button class="p-button-info mt-5">Ranking</Button>
+        </router-link>
       </div>
     </div>
   </div>
