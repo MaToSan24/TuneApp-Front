@@ -8,7 +8,6 @@
       
       <div style="text-align-last: center;">
         <h1>Welcome to the <u>Rebuild the Song</u> Mode!</h1>
-        <img alt="TuneApp Logo" :src="TuneAppLogo" height="100" class="mt-5" />
       </div>
 
       <div class="col-9" id="editorDiv">
@@ -42,7 +41,6 @@
 
 <script>
 import Button from 'primevue/button'
-import TuneAppLogo from "@/assets/TuneAppLogoCropped.png"
 import Topbar from '@/components/Topbar'
 import { VAceEditor } from 'vue3-ace-editor';
 import 'ace-builds/webpack-resolver';
@@ -59,7 +57,6 @@ export default {
   },
   data() {
     return {
-      TuneAppLogo: TuneAppLogo,
       editorPlaceholder: "Input some alda code!",
       progress: { },
       currentAbcFragment: "(none)",

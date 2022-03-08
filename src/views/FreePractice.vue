@@ -12,17 +12,17 @@
 
       <div class="col-9 mt-3 mb-1">
         <h2>Sound Font Options</h2>
-        <p>Instructions: Reload the page, select the desired sound font and click the play button.</p>
         <div v-for="option in soundFontOptions" :key="option.url">
           <div class="mb-2">
-            <RadioButton :id="option.name" name="soundFontOption" :value="option.url" v-model="soundFontUrl" @change="rerender" />
+            <RadioButton :id="option.name" name="soundFontOption" :value="option.url" v-model="soundFontUrl" @change="changeSoundfount" />
             <label class="ml-1" style="line-height: 1.66" :for="option.name">{{option.name}}</label>
           </div>
         </div>
       </div>
 
-      <div class="col-9" id="editorDiv">
-        <v-ace-editor @input="rerender()" id="ace-editor" v-model:value="editorContent" lang="abc" theme="clouds" style="height: 300px;" />
+      <div class="col-12" id="editorDiv" style="text-align: center">
+        <v-ace-editor @input="rerender()" id="ace-editor" v-model:value="editorContent" lang="abc" theme="clouds" style="height: 400px; font-size: 16px" />
+        <Button class="p-button-info mt-3" @click="resetEditorContent">Reset editor content</Button>
       </div>
 
       <div class="abcjsDiv mt-3">
@@ -74,32 +74,12 @@ export default {
       ],
       render: null,
       editor: null,
-      editorContent: `%abc-2.1
-H:This file contains some example English tunes
-% note that the comments (like this one) are to highlight usages
-%  and would not normally be included in such detail
-O:England             % the origin of all tunes is England
-X:1                   % tune no 1
-T:Dusty Miller, The   % title
-T:Binny's Jig         % an alternative title
-C:Trad.               % traditional
-R:DH                  % double hornpipe
-M:3/4                 % meter
-K:G                   % key
-%%MIDI program 32     % 32 = instrument code, defaults to 0
-B>cd BAG|FA Ac BA|B>cd BAG|DG GB AG:|
-Bdd gfg|aA Ac BA|Bdd gfa|gG GB AG:|
-BG G/2G/2G BG|FA Ac BA|BG G/2G/2G BG|DG GB AG:|
-W:Hey, the dusty miller, and his dusty coat;
-W:He will win a shilling, or he spend a groat.
-W:Dusty was the coat, dusty was the colour;
-W:Dusty was the kiss, that I got frae the miller.`,
+      editorContent: ``,
     }
   },
-  created: function () {
-    this.soundFontUrl = this.soundFontOptions[0].url
-  },
-  mounted: function () {
+  mounted() {
+    this.soundFontUrl = this.$store.state.selectedSoundFontUrl
+    this.editorContent = this.$store.state.freePracticeEditorContent
     this.rerender()
   },
   methods: {
@@ -125,8 +105,39 @@ W:Dusty was the kiss, that I got frae the miller.`,
       else
         this.currentAbcFragment = "(none)";
     },
+    changeSoundfount() {
+      this.$store.commit("changeSoundFont", this.soundFontUrl)
+      this.$router.go()
+    },
+    saveEditorContent() {
+      this.$store.commit("updateFreePracticeEditor", this.editorContent)
+    },
+    resetEditorContent() {
+      let defaultContentString = `%abc-2.1
+H:This file contains some example English tunes
+% note that the comments (like this one) are to highlight usages
+%  and would not normally be included in such detail
+O:England             % the origin of all tunes is England
+X:1                   % tune no 1
+T:Dusty Miller, The   % title
+T:Binny's Jig         % an alternative title
+C:Trad.               % traditional
+R:DH                  % double hornpipe
+M:3/4                 % meter
+K:G                   % key
+%%MIDI program 32     % 32 = instrument code, defaults to 0
+B>cd BAG|FA Ac BA|B>cd BAG|DG GB AG:|
+Bdd gfg|aA Ac BA|Bdd gfa|gG GB AG:|
+BG G/2G/2G BG|FA Ac BA|BG G/2G/2G BG|DG GB AG:|
+W:Hey, the dusty miller, and his dusty coat;
+W:He will win a shilling, or he spend a groat.
+W:Dusty was the coat, dusty was the colour;
+W:Dusty was the kiss, that I got frae the miller.`
+      this.editorContent = defaultContentString
+      this.$store.commit("updateFreePracticeEditor", defaultContentString)
+    },
     rerender() {
-      // console.log("Setting soundfont: ", this.soundFontUrl)
+      this.saveEditorContent()
       abcjs.midi.setSoundFont(this.soundFontUrl)
 
       this.render = abcjs.renderAbc("paper", this.editorContent, {});

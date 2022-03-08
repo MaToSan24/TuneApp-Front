@@ -8,11 +8,10 @@
       
       <div style="text-align: center;">
         <h1>Welcome to the <u>Perfect Pitch</u> Mode!</h1>
-        <img alt="TuneApp Logo" :src="TuneAppLogo" height="100" class="mt-5" />
       </div>
 
       <div style="text-align: center; display: flex; flex-direction: column; align-items: center;" class="my-5">
-        <div>
+        <div class="mb-3">
           <Button class="p-button-info mb-3 mr-3" style="width: fit-content;" @click="playRandomNote()">Play a random note</Button>
           <Button class="p-button-info mb-3 ml-3" style="width: fit-content;" @click="playRandomChord()">Play a random chord</Button>
         </div>
@@ -29,7 +28,8 @@
           <Button class="p-button-info mb-3" style="width: fit-content;" @click="resetSettings()">Reset to default settings</Button>
         </fieldset>
 
-        <h3 v-if="this.guessedSolution" class="my-3">Correct! The note was: {{chosenRandomNoteName}}</h3>
+        <h3 v-if="guessedSolution && !guessingChord" class="my-3">Correct! The note was: {{chosenRandomNoteName}}</h3>
+        <h3 v-if="guessedSolution && guessingChord" class="my-3">Correct! The root note was: {{chosenRandomNoteName}}</h3>
 
         <fieldset v-if="guessingOptions.length > 0" id="guessingOptionsFieldset" class="col-12 mt-3 p-3" style="border: groove 3px; text-align: center">
           <legend>Options</legend>
@@ -46,7 +46,7 @@
         <h5>Number of incorrect guesses: {{incorrectGuesses}}</h5>
       </div>
 
-      <div style="display: flex; align-items: center;">
+      <div class="mb-5" style="display: flex; align-items: center;">
         <Button class="p-button-info mr-2" style="width: fit-content;" @click="resetStatistics()">Reset statistics</Button>
         <router-link to="/">
           <Button class="p-button-info ml-2">Home</Button>
@@ -61,7 +61,6 @@
 import Button from 'primevue/button'
 import Slider from 'primevue/slider'
 import ProgressBar from 'primevue/progressbar';
-import TuneAppLogo from "@/assets/TuneAppLogoCropped.png"
 import Topbar from '@/components/Topbar'
 import abcjs from "abcjs/midi";
 import correctGuess from '../assets/sounds/correctGuess.mp3'
@@ -78,7 +77,6 @@ export default {
   },
   data() {
     return {
-      TuneAppLogo: TuneAppLogo,
       pitchRange: [60, 71],
       chosenRandomPitch: 0,
       numGuessingOptions: 6,
@@ -110,6 +108,7 @@ export default {
     },
     playRandomChord() {
       this.guessedSolution = false
+      this.guessingChord = true
       this.chosenRandomPitch = Math.floor(Math.random() * (this.pitchRange[1] - this.pitchRange[0])) + this.pitchRange[0]
       this.chosenRandomNote = {pitch: this.chosenRandomPitch, durationInMeasures: 2, volume: 70, instrument: 0}
       let fifthOfChosenRandomNote = {pitch: this.chosenRandomPitch + 7, durationInMeasures: 2, volume: 70, instrument: 0}
