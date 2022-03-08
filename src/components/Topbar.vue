@@ -1,4 +1,6 @@
 <template>
+
+    <Toast position="bottom-right"/>
 	<div class="layout-topbar">
 
         <router-link to="/" class="layout-topbar-logo mr-3">
@@ -39,25 +41,37 @@ import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import TuneAppLogo from "@/assets/TuneAppLogoCropped.png"
 import axios from 'axios'
+import Toast from 'primevue/toast';
 
 export default {
     components: {
         Menu,
         Dialog,
         Button,
+        Toast,
     },
     props: ['projectInfo'],
     data() {
         return {
             TuneAppLogo: TuneAppLogo,
             displayConfirmation: false,
-            overlayMenuItems: [
-                {
+            overlayMenuItems: [],
+        }
+    },
+    mounted: function() {
+        if (!this.$store.state.loggedIn) {this.overlayMenuItems.push({
+                    label: 'Log in',
+                    icon: 'pi pi-sign-in',
+                    command: () => {window.location = "/login"}
+                })
+        }
+
+        if (this.$store.state.loggedIn) {
+            this.overlayMenuItems.push({
                     label: 'Log out',
                     icon: 'pi pi-sign-out',
                     command: () => {this.openConfirmation()}
-                },
-            ],
+                })
         }
     },
     methods: {
@@ -77,11 +91,14 @@ export default {
             this.$store.dispatch("saveUserId", '');
             this.$store.dispatch("logOut");
 
-            axios.post('/auth/logout').then(() => {
-                this.$toast.add({severity:'success', summary: 'Successful', detail: 'Logged out successfully', life: 3000});
-            }).catch((err) => {
+            axios.post('/auth/logout').catch((err) => {
                 console.log("Error: ", err)
             });
+
+            this.$toast.add({severity:'success', summary: 'Successful', detail: 'Logged out successfully', life: 3000});
+
+            this.overlayMenuItems = [{label: 'Log in', icon: 'pi pi-sign-in', command: () => {window.location = "/login"}}]
+            console.log("this.overlayMenuItems: ", this.overlayMenuItems)
         }
     },
 }

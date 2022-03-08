@@ -5,6 +5,7 @@ const Login = () => import("../views/Login.vue");
 const RebuildSong = () => import("../views/RebuildSong.vue")
 const FreePractice = () => import("../views/FreePractice.vue")
 const PerfectPitch = () => import("../views/PerfectPitch.vue")
+const Ranking = () => import("../views/Ranking.vue")
 
 const routes = [
   {
@@ -31,6 +32,11 @@ const routes = [
     name: "perfectPitch",
     component: PerfectPitch,
   },
+  {
+    path: "/ranking",
+    name: "ranking",
+    component: Ranking,
+  },
 ]
 
 const router = createRouter({
@@ -39,7 +45,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const publicPages = ['/', '/login', '/freePractice', '/perfectPitch'];
+  const publicPages = ['/', '/login', '/freePractice', '/perfectPitch', "/ranking"];
   const authRequired = !publicPages.includes(to.path);
   const loggedIn = store.state.loggedIn;
 

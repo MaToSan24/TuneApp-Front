@@ -8,11 +8,13 @@
       
       <div style="text-align: center;">
         <h1>Welcome to the <u>Perfect Pitch</u> Mode!</h1>
-        <img alt="TuneApp Logo" :src="TuneAppLogo" height="100" class="mt-5" />
       </div>
 
       <div style="text-align: center; display: flex; flex-direction: column; align-items: center;" class="my-5">
-        <Button class="p-button-info mb-3" style="width: fit-content;" @click="playRandomNote()">Play a random note</Button>
+        <div class="mb-3">
+          <Button class="p-button-info mb-3 mr-3" style="width: fit-content;" @click="playRandomNote()">Play a random note</Button>
+          <Button class="p-button-info mb-3 ml-3" style="width: fit-content;" @click="playRandomChord()">Play a random chord</Button>
+        </div>
         <fieldset id="settingsFieldset" class="p-3 mb-3" style="width: fit-content; border: groove 3px; text-align: center">
           <legend>Settings</legend>
           <div class="my-3" style="display: flex; align-items: center; flex-direction: column;">
@@ -26,7 +28,8 @@
           <Button class="p-button-info mb-3" style="width: fit-content;" @click="resetSettings()">Reset to default settings</Button>
         </fieldset>
 
-        <h3 v-if="this.guessedSolution" class="my-3">Correct! The note was: {{chosenRandomNoteName}}</h3>
+        <h3 v-if="guessedSolution && !guessingChord" class="my-3">Correct! The note was: {{chosenRandomNoteName}}</h3>
+        <h3 v-if="guessedSolution && guessingChord" class="my-3">Correct! The root note was: {{chosenRandomNoteName}}</h3>
 
         <fieldset v-if="guessingOptions.length > 0" id="guessingOptionsFieldset" class="col-12 mt-3 p-3" style="border: groove 3px; text-align: center">
           <legend>Options</legend>
@@ -43,7 +46,7 @@
         <h5>Number of incorrect guesses: {{incorrectGuesses}}</h5>
       </div>
 
-      <div style="display: flex; align-items: center;">
+      <div class="mb-5" style="display: flex; align-items: center;">
         <Button class="p-button-info mr-2" style="width: fit-content;" @click="resetStatistics()">Reset statistics</Button>
         <router-link to="/">
           <Button class="p-button-info ml-2">Home</Button>
@@ -58,11 +61,11 @@
 import Button from 'primevue/button'
 import Slider from 'primevue/slider'
 import ProgressBar from 'primevue/progressbar';
-import TuneAppLogo from "@/assets/TuneAppLogoCropped.png"
 import Topbar from '@/components/Topbar'
 import abcjs from "abcjs/midi";
 import correctGuess from '../assets/sounds/correctGuess.mp3'
 import incorrectGuess from '../assets/sounds/incorrectGuess.mp3'
+import axios from "axios";
 
 export default {
   name: 'Home',
@@ -74,7 +77,6 @@ export default {
   },
   data() {
     return {
-      TuneAppLogo: TuneAppLogo,
       pitchRange: [60, 71],
       chosenRandomPitch: 0,
       numGuessingOptions: 6,
@@ -97,11 +99,59 @@ export default {
 
       for (let i = 0; i < this.numGuessingOptions; i++) {
         if (i < optionsToTheLeft)
-          this.guessingOptions.unshift({pitch: this.chosenRandomPitch - i - 1, note: abcjs.synth.pitchToNoteName[this.chosenRandomPitch - i - 1]})
+          this.guessingOptions.unshift({pitch: this.chosenRandomPitch - i - 1, note: abcjs.synth.pitchToNoteName[this.chosenRandomPitch - i - 1], points: 1})
         else if (i > optionsToTheLeft)
-          this.guessingOptions.push({pitch: this.chosenRandomPitch + i - optionsToTheLeft, note: abcjs.synth.pitchToNoteName[this.chosenRandomPitch + i - optionsToTheLeft]})
+          this.guessingOptions.push({pitch: this.chosenRandomPitch + i - optionsToTheLeft, note: abcjs.synth.pitchToNoteName[this.chosenRandomPitch + i - optionsToTheLeft], points: 1})
         else
-          this.guessingOptions.push({pitch: this.chosenRandomPitch, note: abcjs.synth.pitchToNoteName[this.chosenRandomPitch]})
+          this.guessingOptions.push({pitch: this.chosenRandomPitch, note: abcjs.synth.pitchToNoteName[this.chosenRandomPitch], points: 1})
+      }
+    },
+    playRandomChord() {
+      this.guessedSolution = false
+      this.guessingChord = true
+      this.chosenRandomPitch = Math.floor(Math.random() * (this.pitchRange[1] - this.pitchRange[0])) + this.pitchRange[0]
+      this.chosenRandomNote = {pitch: this.chosenRandomPitch, durationInMeasures: 2, volume: 70, instrument: 0}
+      let fifthOfChosenRandomNote = {pitch: this.chosenRandomPitch + 7, durationInMeasures: 2, volume: 70, instrument: 0}
+      let majorThirdOfChosenRandomNote = {pitch: this.chosenRandomPitch + 4, durationInMeasures: 2, volume: 70, instrument: 0}
+      let minorThirdOfChosenRandomNote = {pitch: this.chosenRandomPitch + 3, durationInMeasures: 2, volume: 70, instrument: 0}
+
+      this.guessingOptions = []
+      let optionsToTheLeft = Math.floor(Math.random() * this.numGuessingOptions)
+
+      let chordTypeProbability = Math.random()
+      if (chordTypeProbability < 0.34) {
+        this.playNotes([this.chosenRandomNote, fifthOfChosenRandomNote])
+      
+        for (let i = 0; i < this.numGuessingOptions; i++) {
+          if (i < optionsToTheLeft)
+            this.guessingOptions.unshift({pitch: this.chosenRandomPitch - i - 1, note: abcjs.synth.pitchToNoteName[this.chosenRandomPitch - i - 1].slice(0, -1) + "5", points: 2})
+          else if (i > optionsToTheLeft)
+            this.guessingOptions.push({pitch: this.chosenRandomPitch + i - optionsToTheLeft, note: abcjs.synth.pitchToNoteName[this.chosenRandomPitch + i - optionsToTheLeft].slice(0, -1) + "5", points: 2})
+          else
+            this.guessingOptions.push({pitch: this.chosenRandomPitch, note: abcjs.synth.pitchToNoteName[this.chosenRandomPitch].slice(0, -1) + "5", points: 2})
+        }
+      } else if (chordTypeProbability < 0.68) {
+        this.playNotes([this.chosenRandomNote, majorThirdOfChosenRandomNote, fifthOfChosenRandomNote])
+      
+        for (let i = 0; i < this.numGuessingOptions; i++) {
+          if (i < optionsToTheLeft)
+            this.guessingOptions.unshift({pitch: this.chosenRandomPitch - i - 1, note: abcjs.synth.pitchToNoteName[this.chosenRandomPitch - i - 1].slice(0, -1), points: 3})
+          else if (i > optionsToTheLeft)
+            this.guessingOptions.push({pitch: this.chosenRandomPitch + i - optionsToTheLeft, note: abcjs.synth.pitchToNoteName[this.chosenRandomPitch + i - optionsToTheLeft].slice(0, -1), points: 3})
+          else
+            this.guessingOptions.push({pitch: this.chosenRandomPitch, note: abcjs.synth.pitchToNoteName[this.chosenRandomPitch].slice(0, -1), points: 3})
+        }
+      } else {
+        this.playNotes([this.chosenRandomNote, minorThirdOfChosenRandomNote, fifthOfChosenRandomNote])
+      
+        for (let i = 0; i < this.numGuessingOptions; i++) {
+          if (i < optionsToTheLeft)
+            this.guessingOptions.unshift({pitch: this.chosenRandomPitch - i - 1, note: abcjs.synth.pitchToNoteName[this.chosenRandomPitch - i - 1].slice(0, -1) + "m", points: 3})
+          else if (i > optionsToTheLeft)
+            this.guessingOptions.push({pitch: this.chosenRandomPitch + i - optionsToTheLeft, note: abcjs.synth.pitchToNoteName[this.chosenRandomPitch + i - optionsToTheLeft].slice(0, -1) + "m", points: 3})
+          else
+            this.guessingOptions.push({pitch: this.chosenRandomPitch, note: abcjs.synth.pitchToNoteName[this.chosenRandomPitch].slice(0, -1) + "m", points: 3})
+        }
       }
     },
     playNotes(notesToBePlayed) {
@@ -123,6 +173,7 @@ export default {
           audio.play();
           this.correctGuesses++
           this.guessedSolution = true
+          axios.put(`/users/updateScore/${this.$store.state.userId}`, {"mode": "perfectPitch", "earnedPoints": option.points})
         } else {
           option.isCorrect = false
           audio = new Audio(incorrectGuess);

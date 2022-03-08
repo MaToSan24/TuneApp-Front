@@ -5,7 +5,7 @@ import store from './store'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import PrimeVue from 'primevue/config';
-// import ToastService from 'primevue/toastservice';
+import ToastService from 'primevue/toastservice';
 
 import 'primevue/resources/primevue.min.css';
 import 'primeflex/primeflex.css';
@@ -24,7 +24,7 @@ app
 .use(router)
 .use(VueAxios, axios)
 .use(PrimeVue, { ripple: true, inputStyle: 'outlined' })
-// .use(ToastService)
+.use(ToastService)
 .mount('#app');
 
 
