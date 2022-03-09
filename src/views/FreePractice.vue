@@ -110,8 +110,7 @@ export default {
       this.$router.go()
     },
     saveEditorContent() {
-      this.editorContent = this.editorContent.replace("\r+", "")
-      this.$store.commit("updateFreePracticeEditor", this.editorContent.replace("\r+", ""))
+      this.$store.commit("updateFreePracticeEditor", this.editorContent)
     },
     resetEditorContent() {
       let defaultContentString = `%abc-2.1
@@ -163,6 +162,7 @@ W:Dusty was the kiss, that I got frae the miller.`
       let endRow = 0
       let startFound = false
       let endFound = false
+      this.editorContent = this.editorContent.replace(/(\r)/gm, "");
       let editorRows = this.editorContent.split("\n")
       let charsUntilSelectionStart = this.editor.editarea.getSelection().start
       let charsUntilSelectionEnd = this.editor.editarea.getSelection().end
