@@ -98,7 +98,6 @@ export default {
             this.$toast.add({severity:'success', summary: 'Successful', detail: 'Logged out successfully', life: 3000});
 
             this.overlayMenuItems = [{label: 'Log in', icon: 'pi pi-sign-in', command: () => {window.location = "/login"}}]
-            console.log("this.overlayMenuItems: ", this.overlayMenuItems)
         }
     },
 }

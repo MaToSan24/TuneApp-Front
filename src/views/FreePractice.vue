@@ -110,7 +110,8 @@ export default {
       this.$router.go()
     },
     saveEditorContent() {
-      this.$store.commit("updateFreePracticeEditor", this.editorContent)
+      this.editorContent = this.editorContent.replace("\r+", "")
+      this.$store.commit("updateFreePracticeEditor", this.editorContent.replace("\r+", ""))
     },
     resetEditorContent() {
       let defaultContentString = `%abc-2.1
@@ -166,16 +167,22 @@ W:Dusty was the kiss, that I got frae the miller.`
       let charsUntilSelectionStart = this.editor.editarea.getSelection().start
       let charsUntilSelectionEnd = this.editor.editarea.getSelection().end
 
+      console.log("Editor content: ", editorRows)
+      console.log("Start goal: ", charsUntilSelectionStart)
+      console.log("End goal: ", charsUntilSelectionEnd)
+
       for (let row of editorRows) {
+        console.log("Editor row: ", row)
+
         if (!startFound && charsUntilSelectionStart - row.length <= 0) {
           startFound = true
           startRow = currentRow
-          // console.log("Start found at row '" + startRow + "', column '" + charsUntilSelectionStart + "': ")
+          console.log("Start found at row '" + startRow + "', column '" + charsUntilSelectionStart + "': ")
         }
         if (!endFound && charsUntilSelectionEnd - row.length <= 0) {
           endFound = true
           endRow = currentRow
-          // console.log("End found at row '" + endRow + "', column '" + charsUntilSelectionEnd + "': ")
+          console.log("End found at row '" + endRow + "', column '" + charsUntilSelectionEnd + "': ")
         }
 
         if (startFound && endFound) {

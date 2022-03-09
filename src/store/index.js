@@ -54,8 +54,6 @@ W:Dusty was the kiss, that I got frae the miller.`
       state.selectedSoundFontUrl = url;
     },
     updateFreePracticeEditor(state, newContent){
-      console.log("Current freePracticeEditorContent: ", state.freePracticeEditorContent)
-      console.log("New freePracticeEditorContent: ", newContent)
       state.freePracticeEditorContent = newContent;
     },
   },
