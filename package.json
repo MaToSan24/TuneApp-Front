@@ -8,8 +8,7 @@
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "test": "mocha tests/unit/*.js --timeout 15000",
-    "ci": "start-test \"npm run serve\" 8080 ci-2",
-    "ci-2": "start-test \"node index.js\" http://localhost:3000/api/v1/users test"
+    "ci": "start-test \"npm run serve\" 8080 test"
   },
   "dependencies": {
     "@vue/cli": "^4.5.13",
