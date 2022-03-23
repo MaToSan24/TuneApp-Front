@@ -11,7 +11,7 @@
       </div>
 
       <div style="display: flex; flex-direction: column; align-items: center;">
-        <router-link to="/rebuildSong">
+        <router-link to="/rebuildSongList">
           <Button class="p-button-info">Rebuild the song</Button>
         </router-link>
         <router-link to="/freePractice">
