@@ -7,7 +7,8 @@
     <div class="card col-5" style="display: flex; justify-content: space-around; align-items: center; flex-direction: column">
       
       <div style="text-align-last: center;">
-        <h1>Add a song</h1>
+        <h1 v-if="$route.fullPath.includes('editSong')">Edit song</h1>
+        <h1 v-if="!$route.fullPath.includes('editSong')">Add a song</h1>
       </div>
 
       <div class="p-fluid formgrid grid">
@@ -16,6 +17,12 @@
 						<label for="songName">Song Name</label>
             <InputText v-model="song.name" id="songName" name="songName" :class="{'p-invalid': submitted && errors.filter(e => e.field === 'name').length > 0}" />
             <small style="margin-top: 5px" class="p-error" v-for="error in errors.filter(e => submitted && e.field === 'name')" :key="error.message">{{error.message}}</small>
+          </div>
+
+          <div class="field col-12 md:col-12">
+						<label for="solutionAudioFileName">Solution audio file name</label>
+            <InputText v-model="song.solutionAudioFileName" id="solutionAudioFileName" name="solutionAudioFileName" :class="{'p-invalid': submitted && errors.filter(e => e.field === 'solutionAudioFileName').length > 0}" />
+            <small style="margin-top: 5px" class="p-error" v-for="error in errors.filter(e => submitted && e.field === 'solutionAudioFileName')" :key="error.message">{{error.message}}</small>
           </div>
 
 					<div class="field col-12 md:col-12">

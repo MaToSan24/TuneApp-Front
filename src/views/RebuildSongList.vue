@@ -41,13 +41,13 @@
         <Column field="actions" header="Actions">
           <template #body="slotProps">
             <router-link :to="'/rebuildSong/' + (slotProps.data._id)">
-              <i class="pi pi-arrow-circle-right mr-3" />
+              <i class="pi pi-arrow-circle-right mr-3 actionButton" />
             </router-link>
             <router-link v-if="isCurrentUserAdmin == true" :to="'/editSong/' + (slotProps.data._id)">
-              <i class="pi pi-pencil mr-3" />
+              <i class="pi pi-pencil mr-3 actionButton" />
             </router-link>
             <router-link v-if="isCurrentUserAdmin == true" to="/rebuildSongList">
-              <i class="pi pi-trash" @click="confirmDeleteSong(slotProps.data)" />
+              <i class="pi pi-trash actionButton" @click="confirmDeleteSong(slotProps.data)" />
             </router-link>
           </template>
         </Column>
@@ -143,6 +143,12 @@ export default {
 </script>
 
 <style>
+
+.actionButton {
+  font-size: 2rem;
+  cursor: pointer;
+  color: #495057;
+}
 
 .homeWrapper {
   display: flex;

@@ -10,8 +10,6 @@
         <h1>Welcome to the <u>Rebuild the Song</u> Mode!</h1>
       </div>
 
-      {{songToGuess}}
-
       <div class="col-9 mt-3 mb-1">
         <h2>Sound Font Options</h2>
         <div v-for="option in soundFontOptions" :key="option.url">
@@ -22,7 +20,12 @@
         </div>
       </div>
 
-      <Button class="p-button-info" @click="playSolution()" label="Play solution" />
+      <div class="flex align-items-center" v-if="songToGuess.solutionAudioFileName">
+        <h3 class="m-0 mr-3">Play solution:</h3>
+        <audio id="audioSource" controls preload>
+          <source :src='require("../../public/songs/" + songToGuess.solutionAudioFileName + ".mp3")' type="audio/mpeg">
+        </audio>
+      </div>
 
       <div class="col-12" id="editorDiv" style="text-align: center">
         <v-ace-editor @input="rerender()" id="ace-editor" v-model:value="editorContent" lang="abc" theme="clouds" style="height: 400px; font-size: 16px" />
@@ -81,6 +84,7 @@ export default {
       render: null,
       editor: null,
       editorContent: ``,
+      audioFile: null,
     }
   },
   created() {
@@ -131,28 +135,8 @@ export default {
       this.$store.commit("updateFreePracticeEditor", this.editorContent)
     },
     resetEditorContent() {
-      let defaultContentString = `%abc-2.1
-H:This file contains some example English tunes
-% note that the comments (like this one) are to highlight usages
-%  and would not normally be included in such detail
-O:England             % the origin of all tunes is England
-X:1                   % tune no 1
-T:Dusty Miller, The   % title
-T:Binny's Jig         % an alternative title
-C:Trad.               % traditional
-R:DH                  % double hornpipe
-M:3/4                 % meter
-K:G                   % key
-%%MIDI program 32     % 32 = instrument code, defaults to 0
-B>cd BAG|FA Ac BA|B>cd BAG|DG GB AG:|
-Bdd gfg|aA Ac BA|Bdd gfa|gG GB AG:|
-BG G/2G/2G BG|FA Ac BA|BG G/2G/2G BG|DG GB AG:|
-W:Hey, the dusty miller, and his dusty coat;
-W:He will win a shilling, or he spend a groat.
-W:Dusty was the coat, dusty was the colour;
-W:Dusty was the kiss, that I got frae the miller.`
-      this.editorContent = defaultContentString
-      this.$store.commit("updateFreePracticeEditor", defaultContentString)
+      this.editorContent = this.songToGuess.musicSheet + "%Start typing here..."
+      this.$store.commit("updateFreePracticeEditor", this.songToGuess.musicSheet + "%Start typing here...")
     },
     rerender() {
       this.saveEditorContent()
@@ -173,22 +157,22 @@ W:Dusty was the kiss, that I got frae the miller.`
         }
       });
     },
-    // playSolution() {
-    //   window.AudioContext = window.AudioContext || window.webkitAudioContext;
-    //   var context = new AudioContext();
+    playSolution() {
+      window.AudioContext = window.AudioContext || window.webkitAudioContext;
+      var context = new AudioContext();
 
-    //   var source = context.createBufferSource();
-    //   let pruebaBuffer = Buffer.from(this.songToGuess.solutionAudio.data, 'binary');
-    //   console.log("Prueba buffer: ", pruebaBuffer)
+      var source = context.createBufferSource();
+      let pruebaBuffer = Buffer.from(this.songToGuess.solutionAudio.data, 'binary');
+      console.log("Prueba buffer: ", pruebaBuffer)
 
-    //   context.decodeAudioData(pruebaBuffer.buffer).then((res) => {
-    //     console.log("Res: ", res)
-    //     source.buffer = res
-    //     source.connect(context.destination);
-    //     console.log("Source: ", source)
-    //     source.start(0);
-    //   })
-    // },
+      context.decodeAudioData(pruebaBuffer.buffer).then((res) => {
+        console.log("Res: ", res)
+        source.buffer = res
+        source.connect(context.destination);
+        console.log("Source: ", source)
+        source.start(0);
+      })
+    },
     selectInAceEditor() {
       var aceEditor = ace.edit("ace-editor")
       let currentRow = 0
