@@ -7,21 +7,17 @@
 
     <div class="card col-7" style="display: flex; justify-content: space-around; align-items: center; flex-direction: column">
       
-      <div style="text-align-last: center;">
-        <h1>Welcome to the <u>Rebuild the Song</u> mode!</h1>
-      </div>
-
-      <h1>Songs list</h1>
+      <h1>Song list</h1>
 
       <DataTable :value="songList" :paginator="true" class="p-datatable-gridlines" dataKey="_id"
       :rowHover="true" sortMode="multiple" :rows="5" :loading="loading" responsiveLayout="scroll"
       @page="currentPageSongsTable = $event.page">
         
-        <template #header>
+        <template #header v-if="isCurrentUserAdmin == true">
             <div class="flex justify-content-between flex-column sm:flex-row">
               <div>
                 <router-link to="/addSong">
-                  <Button v-if="isCurrentUserAdmin == true" class="p-button-info"><i class="pi pi-plus mr-2"/>Add a new song</Button>
+                  <Button class="p-button-info"><i class="pi pi-plus mr-2"/>Add a new song</Button>
                 </router-link>
               </div>
             </div>
@@ -37,24 +33,28 @@
 
         <Column field="name" header="Name" :sortable="true" />
         <Column field="difficulty" header="Difficulty" :sortable="true" />
-        <Column field="musicSheet" header="Music sheet" :sortable="true" v-if="isCurrentUserAdmin == true"/>
+        <Column field="musicSheet" header="Music sheet" :sortable="true" v-if="isCurrentUserAdmin == true">
+          <template #body="slotProps">
+            {{slotProps.data[slotProps.field].substring(0, 400)}}{{slotProps.data[slotProps.field].length > 400 ? " (song continues...)" : ""}}
+          </template>
+        </Column>
         <Column field="actions" header="Actions">
           <template #body="slotProps">
-            <router-link :to="'/songs/' + (songList[slotProps.index + currentPageSongsTable * 5]._id)">
+            <router-link :to="'/rebuildSong/' + (slotProps.data._id)">
               <i class="pi pi-arrow-circle-right mr-3" />
             </router-link>
-            <router-link v-if="isCurrentUserAdmin == true" :to="'/editSong/' + (songList[slotProps.index + currentPageSongsTable * 5]._id)">
+            <router-link v-if="isCurrentUserAdmin == true" :to="'/editSong/' + (slotProps.data._id)">
               <i class="pi pi-pencil mr-3" />
             </router-link>
             <router-link v-if="isCurrentUserAdmin == true" to="/rebuildSongList">
-              <i class="pi pi-trash" @click="confirmDeleteSong(slotProps.index + currentPageSongsTable * 5)" />
+              <i class="pi pi-trash" @click="confirmDeleteSong(slotProps.data)" />
             </router-link>
           </template>
         </Column>
       
       </DataTable>
 
-      <Dialog v-model:visible="deleteSongDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
+      <Dialog v-model:visible="deleteSongDialog" header="Confirm" :modal="true">
         <div class="flex align-items-center justify-content-center">
           <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
           <span v-if="songToDelete">Are you sure you want to delete the song: <b>{{songToDelete.name}}</b>?</span>
@@ -119,8 +119,8 @@ export default {
     })
   },
   methods: {
-    confirmDeleteSong(index) {
-      this.songToDelete = this.songList[index]
+    confirmDeleteSong(song) {
+      this.songToDelete = song
       this.deleteSongDialog = true;
     },
     deleteSong() {
