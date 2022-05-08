@@ -1,8 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import store from '../store'
+import axios from 'axios'
 import Home from '../views/Home.vue'
 const Login = () => import("../views/Login.vue");
 const RebuildSong = () => import("../views/RebuildSong.vue")
+const RebuildSongList = () => import("../views/RebuildSongList.vue")
+const AddSong = () => import("../views/AddSong.vue")
 const FreePractice = () => import("../views/FreePractice.vue")
 const PerfectPitch = () => import("../views/PerfectPitch.vue")
 const Ranking = () => import("../views/Ranking.vue")
@@ -18,23 +21,62 @@ const routes = [
     component: Login,
   },
   {
-    path: "/rebuildSong",
-    name: "rebuildSong",
+    path: "/rebuildSong/:id",
+    name: "Rebuild Song",
     component: RebuildSong,
   },
   {
+    path: "/rebuildSongList",
+    name: "Rebuild Song List",
+    component: RebuildSongList,
+  },
+  {
+    path: "/addSong",
+    name: "Add Song",
+    component: AddSong,
+    beforeEnter: (to, from, next) => {
+      axios.get("/users/isAdmin", { params: {
+        userId: store.state.userId
+      }})
+      .then((res) => {
+        if (res.data === true) {
+          next()
+        } else {
+          next("/")
+        }
+      })
+    }
+  },
+  {
+    path: '/editSong/:id',
+    name: 'Edit Song',
+    component: AddSong,
+    beforeEnter: (to, from, next) => {
+      axios.get("/users/isAdmin", { params: {
+        userId: store.state.userId
+      }})
+      .then((res) => {
+        if (res.data === true) {
+          next()
+        } else {
+          next("/")
+        }
+      })
+    }
+  },
+  {
     path: "/freePractice",
-    name: "freePractice",
+    name: "Free Practice",
     component: FreePractice,
   },
   {
     path: "/perfectPitch",
-    name: "perfectPitch",
+    name: "Perfect Pitch",
     component: PerfectPitch,
   },
   {
     path: "/ranking",
-    name: "ranking",
+    name: "Ranking",
     component: Ranking,
   },
 ]
