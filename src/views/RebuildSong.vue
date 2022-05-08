@@ -1,6 +1,7 @@
 <template>
 
   <Topbar />
+  <Toast position="bottom-right"/>
 
   <div class="homeWrapper">
 
@@ -29,7 +30,8 @@
 
       <div class="col-12" id="editorDiv" style="text-align: center">
         <v-ace-editor @input="rerender()" id="ace-editor" v-model:value="editorContent" lang="abc" theme="clouds" style="height: 400px; font-size: 16px" />
-        <Button class="p-button-info mt-3" @click="resetEditorContent">Reset editor content</Button>
+        <Button class="p-button-info mt-3 mr-3" @click="resetEditorContent">Reset editor content</Button>
+        <Button class="p-button-info mt-3 ml-3" @click="checkResult">Check result</Button>
       </div>
 
       <div class="abcjsDiv mt-3">
@@ -60,6 +62,7 @@ import "font-awesome/css/font-awesome.min.css";
 import 'abcjs/abcjs-midi.css';
 import abcjs from "abcjs/midi";
 import axios from 'axios'
+import Toast from 'primevue/toast'
 
 export default {
   name: 'Home',
@@ -68,6 +71,7 @@ export default {
     RadioButton,
     Topbar,
     VAceEditor,
+    Toast,
   },
   data() {
     return {
@@ -157,21 +161,13 @@ export default {
         }
       });
     },
-    playSolution() {
-      window.AudioContext = window.AudioContext || window.webkitAudioContext;
-      var context = new AudioContext();
-
-      var source = context.createBufferSource();
-      let pruebaBuffer = Buffer.from(this.songToGuess.solutionAudio.data, 'binary');
-      console.log("Prueba buffer: ", pruebaBuffer)
-
-      context.decodeAudioData(pruebaBuffer.buffer).then((res) => {
-        console.log("Res: ", res)
-        source.buffer = res
-        source.connect(context.destination);
-        console.log("Source: ", source)
-        source.start(0);
-      })
+    async checkResult() {
+      try {
+        let songResult = await axios.post("/songs/checkResult", {song: this.songToGuess, userAttempt: this.editorContent, userId: this.$store.state.userId})
+        this.$toast.add({severity:'success', summary: 'Result', detail: 'Your score is ' + (songResult.data * this.songToGuess.difficulty * 50).toFixed() + ' out of ' + this.songToGuess.difficulty * 50, life: 3000});
+      } catch(error) {
+        console.log("Error: ", error)
+      }
     },
     selectInAceEditor() {
       var aceEditor = ace.edit("ace-editor")

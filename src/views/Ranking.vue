@@ -10,10 +10,14 @@
         <h1>Ranking of users</h1>
       </div>
 
-        <DataTable class="my-5" :value="users" sortMode="multiple" :multiSortMeta="[{field: 'rebuildTheSongScore', order: -1}, {field: 'perfectPitchScore', order: -1}]" responsiveLayout="scroll">
+        <DataTable class="my-5" :value="users" sortMode="multiple" :multiSortMeta="[{field: 'rebuildTheSongScore', order: -1}, {field: 'perfectPitchScore', order: -1}]" responsiveLayout="scroll" removableSort>
             <Column field="username" header="Username"></Column>
-            <Column field="rebuildTheSongScore" header="Rebuild The Song Score" :sortable="true"></Column>
-            <Column field="perfectPitchScore" header="Perfect Pitch Score" :sortable="true"></Column>
+            <Column field="rebuildTheSongScore" header="Rebuild The Song Score" :sortable="true">
+              <template #body="slotProps">
+                {{sumScores(slotProps.data.rebuildTheSongScore)}}
+              </template>
+            </Column>
+            <Column field="perfectPitchScore" header="Perfect Pitch Score" :sortable="true" />
         </DataTable>
 
       <div style="display: flex; align-items: center;">
@@ -56,7 +60,13 @@ export default {
       })
   },
   methods: {
-
+    sumScores(object) {
+      let sum = 0
+      for (let key in object) {
+        sum += object[key]
+      }
+      return sum
+    }
   }
 }
 </script>
