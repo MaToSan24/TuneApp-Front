@@ -4,7 +4,7 @@ const expect = require('chai').expect;
 require("dotenv").config();
 
 chai.use(chaiHttp);
-const url = process.env.VUE_APP_BACKEND_URL || 'http://localhost:3000/api/v1';
+const url = process.env.VUE_APP_BACKEND_URL || 'http://localhost:3000/api/v1/';
 
 describe('Register: ', () => {
     it('should register successfully', (done) => {
